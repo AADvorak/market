@@ -1,0 +1,108 @@
+type Query {
+    shops(filter: String, excludeProductId: Int, page: Int!, size: Int!): ShopsPage
+    products(filter: String, page: Int!, size: Int!): ProductsPage
+    prices(productId: ID!, sortDir: String, page: Int!, size: Int!): PricesPage
+    shop(id: ID!): ShopDtoResponse
+    product(id: ID!): ProductDtoResponse
+    getUserInfo: UserDtoResponse
+}
+
+type Mutation {
+    addShop(input: ShopDtoRequest!): ShopDtoResponse
+    addProduct(input: ProductDtoRequest!): ProductDtoResponse
+    addPrice(input: PriceDtoRequest!): PriceDtoResponse
+    editShop(input: EditShopDtoRequest!): Boolean
+    editProduct(input: EditProductDtoRequest!): Boolean
+    editPrice(input: EditPriceDtoRequest!): Boolean
+    deleteShop(id: ID!): Boolean
+    deleteProduct(id: ID!): Boolean
+    deletePrice(id: ID!): Boolean
+}
+
+type ShopDtoResponse {
+    id: Int
+    name: String
+    description: String
+}
+
+type ProductDtoResponse {
+    id: Int
+    vendorCode: String
+    name: String
+    description: String
+}
+
+type ShopsPage {
+    elements: Int
+    pages: Int
+    data: [ShopDtoResponse]
+}
+
+type ProductsPage {
+    elements: Int
+    pages: Int
+    data: [ProductDtoResponse]
+}
+
+type PricesPage {
+    elements: Int
+    pages: Int
+    data: [PriceDtoResponse]
+}
+
+type LoginDtoResponse {
+    token: String
+}
+
+type RegisterDtoResponse {
+    token: String
+}
+
+type UserDtoResponse {
+    firstName: String
+    lastName: String
+    email: String
+    roles: [String]
+}
+
+type PriceDtoResponse {
+    id: Int
+    shopId: Int
+    shopName: String
+    price: Float
+}
+
+input ShopDtoRequest {
+    name: String!
+    description: String!
+}
+
+input ProductDtoRequest {
+    vendorCode: String!
+    name: String!
+    description: String!
+}
+
+input PriceDtoRequest {
+    productId: Int!
+    shopId: Int!
+    price: Float!
+}
+
+input EditShopDtoRequest {
+    id: ID!
+    name: String!
+    description: String!
+}
+
+input EditProductDtoRequest {
+    id: ID!
+    vendorCode: String!
+    name: String!
+    description: String!
+}
+
+input EditPriceDtoRequest {
+    id: ID!
+    price: Float!
+}

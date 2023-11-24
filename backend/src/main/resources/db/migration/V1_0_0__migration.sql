@@ -1,0 +1,30 @@
+CREATE TABLE product (
+  id INT AUTO_INCREMENT NOT NULL,
+   vendor_code VARCHAR(20) NOT NULL,
+   name VARCHAR(255) NOT NULL,
+   `description` VARCHAR(255) NULL,
+   CONSTRAINT pk_product PRIMARY KEY (id)
+);
+
+ALTER TABLE product ADD CONSTRAINT uc_product_vendorcode UNIQUE (vendor_code);
+
+CREATE TABLE shop (
+  id INT AUTO_INCREMENT NOT NULL,
+   name VARCHAR(255) NOT NULL,
+   `description` VARCHAR(255) NULL,
+   CONSTRAINT pk_shop PRIMARY KEY (id)
+);
+
+CREATE TABLE price (
+  id INT AUTO_INCREMENT NOT NULL,
+   product_id INT NOT NULL,
+   shop_id INT NOT NULL,
+   price DECIMAL(10,2) NOT NULL,
+   CONSTRAINT pk_price PRIMARY KEY (id)
+);
+
+ALTER TABLE price ADD CONSTRAINT uc_0619534ff53793863be91b88b UNIQUE (product_id, shop_id);
+
+ALTER TABLE price ADD CONSTRAINT FK_PRICE_ON_PRODUCT FOREIGN KEY (product_id) REFERENCES product (id) ON DELETE CASCADE;
+
+ALTER TABLE price ADD CONSTRAINT FK_PRICE_ON_SHOP FOREIGN KEY (shop_id) REFERENCES shop (id) ON DELETE CASCADE;
