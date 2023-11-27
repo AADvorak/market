@@ -18,7 +18,7 @@
                 <price-table
                     :product-id="product.id"
                     :bus="bus"/>
-                <v-btn v-if="isAdmin" @click="showShopTable">
+                <v-btn v-if="user.isAdmin" @click="showShopTable">
                   Добавить
                 </v-btn>
               </v-card-text>
@@ -45,6 +45,8 @@ import mitt from "mitt";
 import type {Emitter} from "mitt";
 import {Product, Shop} from "~/data/model";
 
+const user = useUser()
+
 const bus: Emitter<any> = mitt()
 bus.on('product-loaded', productLoaded)
 bus.on('product-saved', productSaved)
@@ -54,7 +56,6 @@ const
     shopTableOpened = ref<boolean>(false)
 
 const
-    isAdmin = computed<boolean>(() => useUser().isAdmin),
     cols = computed<number>(() => product.value.id ? 6 : 12)
 
 onMounted(() => {

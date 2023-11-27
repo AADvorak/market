@@ -24,7 +24,7 @@
               <th class="text-left">
                 Описание
               </th>
-              <th v-if="isAdmin" class="text-right"/>
+              <th v-if="user.isAdmin" class="text-right"/>
             </tr>
             </thead>
             <tbody>
@@ -33,7 +33,7 @@
               <td>{{ p.vendorCode }}</td>
               <td>{{ p.name }}</td>
               <td>{{ p.description }}</td>
-              <td class="text-right" v-if="isAdmin">
+              <td class="text-right" v-if="user.isAdmin">
                 <v-icon @click.stop="askConfirmDeleteProduct(p)">
                   {{ mdiDelete }}
                 </v-icon>
@@ -45,7 +45,7 @@
               v-model="currentPage"
               :length="products.pages"
           ></v-pagination>
-          <v-btn v-if="isAdmin" @click="addProduct">Добавить товар</v-btn>
+          <v-btn v-if="user.isAdmin" @click="addProduct">Добавить товар</v-btn>
         </v-card-text>
       </v-card>
       <confirm-dialog
@@ -62,7 +62,9 @@ import SearchField from "../components/search-field";
 import {useUser} from "~/stores/user";
 import {mdiDelete} from "@mdi/js";
 import ConfirmDialog from "../components/confirm-dialog";
-import {usePageAndFilter} from "~/components/page-and-filter";
+import {usePageAndFilter} from "~/composables/page-and-filter";
+
+const user = useUser()
 
 const {
   filter,
@@ -83,8 +85,6 @@ const
       pages: 0,
       data: []
     })
-
-const isAdmin = computed(() => useUser().isAdmin)
 
 watch([currentPage, filter], () => {
   setUrlParams()

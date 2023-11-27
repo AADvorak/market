@@ -5,7 +5,7 @@
       <v-btn to="/shops" nuxt>Магазины</v-btn>
       <v-switch hide-details v-model="darkMode" label="Темный режим"/>
       <v-spacer></v-spacer>
-      <v-btn> {{ userButtonText }}</v-btn>
+      <v-btn> {{ user.description }}</v-btn>
       <v-btn @click="logout">Выход</v-btn>
     </v-app-bar>
     <v-main>
@@ -14,42 +14,24 @@
   </v-app>
 </template>
 
-<script>
-
+<script setup>
 import {useUser} from "~/stores/user";
+import {useDarkMode} from "~/composables/dark-mode";
 
-export default {
-  data() {
-    return {
-      darkMode: localStorage.getItem('darkMode') === 'true'
-    }
-  },
-  computed: {
-    theme() {
-      return this.darkMode ? 'dark' : 'light'
-    },
-    userButtonText() {
-      return useUser().userRepresentingString
-    }
-  },
-  watch: {
-    darkMode(newValue) {
-      localStorage.setItem('darkMode', newValue)
-    }
-  },
-  methods: {
-    logout() {
-      useUser().clear()
-      window.open(
-          '/logout',
-          '_self'
-      )
-    }
-  },
-  mounted() {
-    if (!useUser().user.email) {
-      useUser().load()
-    }
+const {darkMode, theme} = useDarkMode()
+const user = useUser()
+
+onMounted(() => {
+  if (!user.user.email) {
+    user.load()
   }
+})
+
+function logout() {
+  user.clear()
+  window.open(
+      '/logout',
+      '_self'
+  )
 }
 </script>

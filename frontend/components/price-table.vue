@@ -8,14 +8,14 @@
       <th class="text-left">
         Цена
       </th>
-      <th v-if="isAdmin" class="text-left"/>
+      <th v-if="user.isAdmin" class="text-left"/>
     </tr>
     </thead>
     <tbody>
     <tr v-for="p in prices.data" @click="editPrice(p)">
       <td>{{ p.shopName }}</td>
       <td>{{ p.price }}</td>
-      <td class="text-right" v-if="isAdmin">
+      <td class="text-right" v-if="user.isAdmin">
         <v-icon @click.stop="askConfirmDeletePrice(p)">
           {{ mdi.delete }}
         </v-icon>
@@ -40,6 +40,8 @@ import type {Emitter} from "mitt";
 import {DataWithCounts, Price} from "~/data/model";
 import {DialogConfig} from "~/data/props";
 
+const user = useUser()
+
 const props = defineProps<{
   productId: number
   bus: Emitter<any>
@@ -56,14 +58,12 @@ const
     prices = ref<DataWithCounts<Price>>(DataWithCounts.empty()),
     currentPage = ref<number>(1)
 
-const isAdmin = computed(() => useUser().isAdmin)
-
 watch([() => props.productId, currentPage], fetchPrices)
 
 onMounted(fetchPrices)
 
 function editPrice(price: Price) {
-  if (isAdmin.value) {
+  if (user.isAdmin) {
     props.bus.emit('edit-price', price)
   }
 }

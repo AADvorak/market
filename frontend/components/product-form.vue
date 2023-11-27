@@ -3,25 +3,25 @@
     <v-text-field
         v-model="product.vendorCode"
         label="Артикул"
-        :disabled="isAdmin === false"
+        :disabled="!user.isAdmin"
         :error="!!validation.vendorCode.length"
         :error-messages="validation.vendorCode"
         required/>
     <v-text-field
         v-model="product.name"
         label="Имя"
-        :disabled="isAdmin === false"
+        :disabled="!user.isAdmin"
         :error="!!validation.name.length"
         :error-messages="validation.name"
         required/>
     <v-text-field
         v-model="product.description"
         label="Описание"
-        :disabled="isAdmin === false"
+        :disabled="!user.isAdmin"
         :error="!!validation.description.length"
         :error-messages="validation.description"
         required/>
-    <v-btn v-if="isAdmin" @click="saveProduct">
+    <v-btn v-if="user.isAdmin" @click="saveProduct">
       Сохранить
     </v-btn>
   </v-form>
@@ -32,6 +32,8 @@ import {ApiProvider} from "~/api/api-provider";
 import {useUser} from "~/stores/user";
 import {Product} from "~/data/model";
 import type {Emitter} from "mitt";
+
+const user = useUser()
 
 class ProductValidation {
   constructor(
@@ -54,8 +56,6 @@ props.bus.on('fetch-product', fetchProduct)
 const
     validation = ref<ProductValidation>(ProductValidation.empty()),
     product = ref<Product>(Product.empty())
-
-const isAdmin = computed<boolean>(() => useUser().isAdmin)
 
 async function fetchProduct(productId: number) {
   const data = (await new ApiProvider({

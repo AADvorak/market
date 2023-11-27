@@ -11,7 +11,7 @@
 </template>
 
 <script setup>
-import {usePageAndFilter} from "~/components/page-and-filter";
+import {usePageAndFilter} from "~/composables/page-and-filter";
 
 const {
   filter,

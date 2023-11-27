@@ -6,17 +6,8 @@
   </v-app>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      darkMode: localStorage.getItem('darkMode') === 'true'
-    }
-  },
-  computed: {
-    theme() {
-      return this.darkMode ? 'dark' : 'light'
-    }
-  },
-}
+<script setup>
+import {useDarkMode} from "~/composables/dark-mode";
+
+const {theme} = useDarkMode()
 </script>

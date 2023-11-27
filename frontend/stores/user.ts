@@ -9,7 +9,7 @@ export const useUser = defineStore('user', {
     }
   },
   getters: {
-    userRepresentingString: (state) => {
+    description: (state) => {
       const user = state.user
       if (user.firstName && user.lastName) {
         return user.firstName + ' ' + user.lastName
