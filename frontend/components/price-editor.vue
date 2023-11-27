@@ -33,10 +33,11 @@
 </template>
 
 <script setup lang="ts">
-import {ApiProvider} from "~/api/api-provider";
 import type {Emitter} from "mitt";
 import {Price} from "~/data/model";
 import {DialogConfig} from "~/data/props";
+import {useGraphql} from "~/composables/graphql";
+import {useFillValidation} from "~/composables/fill-validation";
 
 class PriceValidation {
   constructor(public price: string[], public shopId: string[]) {}
@@ -97,16 +98,16 @@ async function savePrice() {
     name = 'addPrice'
     responseFields = ['id', 'shopId', 'shopName', 'price']
   }
-  const provider = (await new ApiProvider({
+  const {errors} = await useGraphql({
     name,
     type: 'mutation',
     variables: {
       input
     },
     responseFields
-  }).sendRequest())
-  if (provider?.getErrors().length) {
-    provider.fillValidation(validation.value)
+  })
+  if (errors.length) {
+    useFillValidation(validation.value, errors)
     if (validation.value.shopId.length) {
       showMessage('Цена для выбранного магазина уже задана')
       hideAndFetchPrices()

@@ -38,7 +38,7 @@
 
 <script setup>
 import SearchField from "./search-field";
-import {ApiProvider} from "~/api/api-provider";
+import {useGraphql} from "~/composables/graphql";
 
 const props = defineProps({
   initFilter: String,
@@ -73,7 +73,7 @@ onMounted(() => {
 })
 
 async function fetchShops() {
-  const data = (await new ApiProvider({
+  const {data} = await useGraphql({
     type: 'query',
     name: 'shops',
     variables: {
@@ -97,7 +97,7 @@ async function fetchShops() {
     responseFields: ['elements', 'pages', {
       'data': ['id', 'name', 'description']
     }]
-  }).sendRequest()).getData()
+  })
   if (data) {
     shops.value = data
   }

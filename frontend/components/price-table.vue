@@ -34,11 +34,11 @@
 
 <script setup lang="ts">
 import {useUser} from "~/stores/user";
-import {ApiProvider} from "~/api/api-provider";
 import {mdiDelete} from "@mdi/js";
 import type {Emitter} from "mitt";
 import {DataWithCounts, Price} from "~/data/model";
 import {DialogConfig} from "~/data/props";
+import {useGraphql} from "~/composables/graphql";
 
 const user = useUser()
 
@@ -68,7 +68,7 @@ function editPrice(price: Price) {
   }
 }
 async function fetchPrices() {
-  const data = (await new ApiProvider({
+  const {data} = await useGraphql({
     name: 'prices',
     variables: {
       productId: {
@@ -87,7 +87,7 @@ async function fetchPrices() {
     responseFields: ['elements', 'pages', {
       'data': ['id', 'shopId', 'shopName', 'price']
     }]
-  }).sendRequest())?.getData()
+  })
   if (data) {
     prices.value = data
   }
@@ -99,7 +99,7 @@ function askConfirmDeletePrice(price: Price) {
 }
 async function deletePrice() {
   dialog.value.opened = false
-  const errors = (await new ApiProvider({
+  const {errors} = await useGraphql({
     type: 'mutation',
     name: 'deletePrice',
     variables: {
@@ -108,8 +108,8 @@ async function deletePrice() {
         type: 'ID!'
       }
     }
-  }).sendRequest())?.getErrors()
-  if (!errors?.length) {
+  })
+  if (!errors.length) {
     await fetchPrices()
   }
 }

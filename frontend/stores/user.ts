@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
-import {ApiProvider} from "~/api/api-provider";
 import {User} from "~/data/model";
+import {useGraphql} from "~/composables/graphql"
 
 export const useUser = defineStore('user', {
   state: () => {
@@ -22,10 +22,10 @@ export const useUser = defineStore('user', {
   },
   actions: {
     async load() {
-      const data = (await new ApiProvider({
+      const {data} = await useGraphql({
         name: 'getUserInfo',
         responseFields: ['firstName', 'lastName', 'email', 'roles']
-      }).sendRequest())?.getData()
+      })
       if (data) {
         this.user = data
       }

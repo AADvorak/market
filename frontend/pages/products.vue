@@ -57,12 +57,12 @@
 </template>
 
 <script setup>
-import {ApiProvider} from "~/api/api-provider";
 import SearchField from "../components/search-field";
 import {useUser} from "~/stores/user";
 import {mdiDelete} from "@mdi/js";
 import ConfirmDialog from "../components/confirm-dialog";
 import {usePageAndFilter} from "~/composables/page-and-filter";
+import {useGraphql} from "~/composables/graphql";
 
 const user = useUser()
 
@@ -98,7 +98,7 @@ onMounted(() => {
 })
 
 async function fetchProducts() {
-  const data = (await new ApiProvider({
+  const {data} = await useGraphql({
     type: 'query',
     name: 'products',
     variables: {
@@ -118,7 +118,7 @@ async function fetchProducts() {
     responseFields: ['elements', 'pages', {
       'data': ['id', 'vendorCode', 'name', 'description']
     }]
-  }).sendRequest()).getData()
+  })
   if (data) {
     products.value = data
   }
@@ -136,7 +136,7 @@ function askConfirmDeleteProduct(product) {
 }
 async function deleteProduct() {
   dialog.value.opened = false
-  const errors = (await new ApiProvider({
+  const {errors} = await useGraphql({
     type: 'mutation',
     name: 'deleteProduct',
     variables: {
@@ -145,7 +145,7 @@ async function deleteProduct() {
         type: 'ID!'
       }
     }
-  }).sendRequest()).getErrors()
+  })
   if (!errors.length) {
     await fetchProducts()
   }

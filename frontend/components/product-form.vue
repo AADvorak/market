@@ -28,10 +28,11 @@
 </template>
 
 <script setup lang="ts">
-import {ApiProvider} from "~/api/api-provider";
 import {useUser} from "~/stores/user";
 import {Product} from "~/data/model";
 import type {Emitter} from "mitt";
+import {useGraphql} from "~/composables/graphql";
+import {useFillValidation} from "~/composables/fill-validation";
 
 const user = useUser()
 
@@ -58,7 +59,7 @@ const
     product = ref<Product>(Product.empty())
 
 async function fetchProduct(productId: number) {
-  const data = (await new ApiProvider({
+  const {data} = await useGraphql({
     name: 'product',
     variables: {
       id: {
@@ -67,7 +68,7 @@ async function fetchProduct(productId: number) {
       }
     },
     responseFields: ['id', 'vendorCode', 'name', 'description']
-  }).sendRequest())?.getData()
+  })
   if (data) {
     product.value = data
     props.bus.emit('product-loaded', product.value)
@@ -77,7 +78,7 @@ async function fetchProduct(productId: number) {
 async function saveProduct() {
   resetValidation()
   if (product.value.id) {
-    const provider = (await new ApiProvider({
+    const {errors} = await useGraphql({
       name: 'editProduct',
       type: 'mutation',
       variables: {
@@ -87,12 +88,12 @@ async function saveProduct() {
         }
       },
       responseFields: []
-    }).sendRequest())
-    if (provider?.getErrors().length) {
-      provider.fillValidation(validation.value)
+    })
+    if (errors.length) {
+      useFillValidation(validation.value, errors)
     }
   } else {
-    const provider = (await new ApiProvider({
+    const {data, errors} = await useGraphql({
       name: 'addProduct',
       type: 'mutation',
       variables: {
@@ -106,11 +107,11 @@ async function saveProduct() {
         }
       },
       responseFields: ['id', 'vendorCode', 'name', 'description']
-    }).sendRequest())
-    if (provider?.getErrors().length) {
-      provider.fillValidation(validation.value)
-    } else if (provider?.getData()) {
-      product.value = provider.getData()
+    })
+    if (errors.length) {
+      useFillValidation(validation.value, errors)
+    } else if (data) {
+      product.value = data
       props.bus.emit('product-saved', product.value)
     }
   }
