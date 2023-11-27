@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-import {userInfo} from "~/stores/user-info";
+import {useUser} from "~/stores/user";
 import mitt from "mitt";
 import type {Emitter} from "mitt";
 import {Product, Shop} from "~/data/model";
@@ -54,7 +54,7 @@ const
     shopTableOpened = ref<boolean>(false)
 
 const
-    isAdmin = computed<boolean>(() => userInfo().isAdmin),
+    isAdmin = computed<boolean>(() => useUser().isAdmin),
     cols = computed<number>(() => product.value.id ? 6 : 12)
 
 onMounted(() => {

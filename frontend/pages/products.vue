@@ -59,7 +59,7 @@
 <script setup>
 import {ApiProvider} from "~/api/api-provider";
 import SearchField from "../components/search-field";
-import {userInfo} from "~/stores/user-info";
+import {useUser} from "~/stores/user";
 import {mdiDelete} from "@mdi/js";
 import ConfirmDialog from "../components/confirm-dialog";
 import {usePageAndFilter} from "~/components/page-and-filter";
@@ -84,7 +84,7 @@ const
       data: []
     })
 
-const isAdmin = computed(() => userInfo().isAdmin)
+const isAdmin = computed(() => useUser().isAdmin)
 
 watch([currentPage, filter], () => {
   setUrlParams()

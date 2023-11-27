@@ -33,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import {userInfo} from "~/stores/user-info";
+import {useUser} from "~/stores/user";
 import {ApiProvider} from "~/api/api-provider";
 import {mdiDelete} from "@mdi/js";
 import type {Emitter} from "mitt";
@@ -56,7 +56,7 @@ const
     prices = ref<DataWithCounts<Price>>(DataWithCounts.empty()),
     currentPage = ref<number>(1)
 
-const isAdmin = computed(() => userInfo().isAdmin)
+const isAdmin = computed(() => useUser().isAdmin)
 
 watch([() => props.productId, currentPage], fetchPrices)
 

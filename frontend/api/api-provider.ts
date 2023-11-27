@@ -1,7 +1,6 @@
 import {GraphqlRequestSender} from "./graphql-request-sender";
-import {userInfo} from "~/stores/user-info";
+import {useUser} from "~/stores/user";
 import type {GraphqlRequest} from "~/data/request";
-import {FetchError} from "ofetch";
 
 interface Validation {
   [index: string]: string[]
@@ -29,7 +28,7 @@ export class ApiProvider {
       return this
     } catch (e: any) {
       if (e.status === 401) {
-        userInfo().clearUserInfo()
+        useUser().clear()
         window.location.href = '/oauth2/authorization/external'
       }
     }

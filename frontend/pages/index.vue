@@ -3,9 +3,9 @@
 </template>
 
 <script setup>
-import {userInfo} from "~/stores/user-info";
+import {useUser} from "~/stores/user";
 
-userInfo().loadUserInfo().then(() => {
+useUser().load().then(() => {
   useRouter().push("/products")
 })
 </script>

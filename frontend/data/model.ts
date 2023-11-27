@@ -36,6 +36,19 @@ export class Shop {
   }
 }
 
+export class User {
+  constructor(
+      public firstName: string,
+      public lastName: string,
+      public email: string,
+      public roles: string[]) {
+  }
+
+  static empty() {
+    return new User('', '', '', [])
+  }
+}
+
 export class DataWithCounts<T> {
   constructor(
       public elements: number,

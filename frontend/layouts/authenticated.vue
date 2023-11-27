@@ -16,7 +16,7 @@
 
 <script>
 
-import {userInfo} from "~/stores/user-info";
+import {useUser} from "~/stores/user";
 
 export default {
   data() {
@@ -29,7 +29,7 @@ export default {
       return this.darkMode ? 'dark' : 'light'
     },
     userButtonText() {
-      return userInfo().userRepresentingString
+      return useUser().userRepresentingString
     }
   },
   watch: {
@@ -39,7 +39,7 @@ export default {
   },
   methods: {
     logout() {
-      userInfo().clearUserInfo()
+      useUser().clear()
       window.open(
           '/logout',
           '_self'
@@ -47,8 +47,8 @@ export default {
     }
   },
   mounted() {
-    if (!userInfo().userInfo.email) {
-      userInfo().loadUserInfo()
+    if (!useUser().user.email) {
+      useUser().load()
     }
   }
 }

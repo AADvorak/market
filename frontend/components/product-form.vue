@@ -29,7 +29,7 @@
 
 <script setup lang="ts">
 import {ApiProvider} from "~/api/api-provider";
-import {userInfo} from "~/stores/user-info";
+import {useUser} from "~/stores/user";
 import {Product} from "~/data/model";
 import type {Emitter} from "mitt";
 
@@ -55,7 +55,7 @@ const
     validation = ref<ProductValidation>(ProductValidation.empty()),
     product = ref<Product>(Product.empty())
 
-const isAdmin = computed<boolean>(() => userInfo().isAdmin)
+const isAdmin = computed<boolean>(() => useUser().isAdmin)
 
 async function fetchProduct(productId: number) {
   const data = (await new ApiProvider({
