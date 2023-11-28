@@ -72,7 +72,7 @@ const {
   setFilter,
   readUrlParams,
   setUrlParams
-} = usePageAndFilter('/products')
+} = usePageAndFilter()
 
 const
     dialog = ref({

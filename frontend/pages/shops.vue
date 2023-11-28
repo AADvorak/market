@@ -20,7 +20,7 @@ const {
   setCurrentPage,
   readUrlParams,
   setUrlParams
-} = usePageAndFilter('/shops')
+} = usePageAndFilter()
 
 watch([currentPage, filter], () => {
   setUrlParams()

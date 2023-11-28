@@ -1,4 +1,4 @@
-export function usePageAndFilter(baseUrl) {
+export function usePageAndFilter() {
   const
       filter = ref(''),
       currentPage = ref(1)
@@ -22,11 +22,11 @@ export function usePageAndFilter(baseUrl) {
     }
   }
   function setUrlParams() {
-    let url = `${baseUrl}?page=${currentPage.value}`
+    const query = {page: currentPage.value}
     if (filter.value) {
-      url += `&filter=${filter.value}`
+      query.filter = filter.value
     }
-    useRouter().push(url)
+    useRouter().replace({query})
   }
 
   return {filter, currentPage, setFilter, setCurrentPage, readUrlParams, setUrlParams}
