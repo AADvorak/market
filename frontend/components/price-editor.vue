@@ -29,7 +29,7 @@
       </v-card-text>
     </v-card>
   </v-dialog>
-  <message :config="message" @hide="hideMessage"/>
+  <message-dialog :config="messageDialogConfig" @hide="hideMessage"/>
 </template>
 
 <script setup lang="ts">
@@ -57,7 +57,7 @@ const
     validation = ref<PriceValidation>(PriceValidation.empty()),
     editedPrice = ref<Price>(Price.empty()),
     modelPrice = ref<string>(''),
-    message = ref<DialogConfig>(DialogConfig.default())
+    messageDialogConfig = reactive<DialogConfig>(DialogConfig.default())
 
 props.bus.on('edit-price', (price: Price) => {
   editedPrice.value = price
@@ -124,13 +124,11 @@ function resetValidation() {
   validation.value = PriceValidation.empty()
 }
 function showMessage(text: string) {
-  message.value = {
-    opened: true,
-    text
-  }
+  messageDialogConfig.opened = true
+  messageDialogConfig.text = text
 }
 function hideMessage() {
-  message.value.opened = false
+  messageDialogConfig.opened = false
 }
 function show() {
   opened.value = true

@@ -74,7 +74,6 @@ async function fetchProduct(productId: number) {
     props.bus.emit('product-loaded', product.value)
   }
 }
-
 async function saveProduct() {
   resetValidation()
   if (product.value.id) {

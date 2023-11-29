@@ -17,7 +17,7 @@
       <td>{{ p.price }}</td>
       <td class="text-right" v-if="user.isAdmin">
         <v-icon @click.stop="askConfirmDeletePrice(p)">
-          {{ mdi.delete }}
+          {{ mdiDelete }}
         </v-icon>
       </td>
     </tr>
@@ -27,7 +27,7 @@
       v-model="currentPage"
       :length="prices.pages"/>
   <confirm-dialog
-      :config="dialog"
+      :config="confirmDialogConfig"
       @ok="deletePrice"
       @cancel="cancelDeletePrice"/>
 </template>
@@ -50,13 +50,10 @@ const props = defineProps<{
 props.bus.on('fetch-prices', fetchPrices)
 
 const
-    mdi = ref({
-      delete: mdiDelete
-    }),
-    dialog = ref<DialogConfig>(DialogConfig.default()),
     priceIdForDelete = ref<number>(0),
+    currentPage = ref<number>(1),
     prices = ref<DataWithCounts<Price>>(DataWithCounts.empty()),
-    currentPage = ref<number>(1)
+    confirmDialogConfig = reactive<DialogConfig>(DialogConfig.default())
 
 watch([() => props.productId, currentPage], fetchPrices)
 
@@ -94,11 +91,11 @@ async function fetchPrices() {
 }
 function askConfirmDeletePrice(price: Price) {
   priceIdForDelete.value = price.id
-  dialog.value.text = `Удалить цену товара в магазине ${price.shopName}?`
-  dialog.value.opened = true
+  confirmDialogConfig.text = `Удалить цену товара в магазине ${price.shopName}?`
+  confirmDialogConfig.opened = true
 }
 async function deletePrice() {
-  dialog.value.opened = false
+  confirmDialogConfig.opened = false
   const {errors} = await useGraphql({
     type: 'mutation',
     name: 'deletePrice',
@@ -114,6 +111,6 @@ async function deletePrice() {
   }
 }
 function cancelDeletePrice() {
-  dialog.value.opened = false
+  confirmDialogConfig.opened = false
 }
 </script>

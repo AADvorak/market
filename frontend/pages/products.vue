@@ -49,7 +49,7 @@
         </v-card-text>
       </v-card>
       <confirm-dialog
-          :config="dialog"
+          :config="confirmDialogConfig"
           @ok="deleteProduct"
           @cancel="cancelDeleteProduct"/>
     </div>
@@ -57,10 +57,8 @@
 </template>
 
 <script setup>
-import SearchField from "../components/search-field";
 import {useUser} from "~/stores/user";
 import {mdiDelete} from "@mdi/js";
-import ConfirmDialog from "../components/confirm-dialog";
 import {usePageAndFilter} from "~/composables/page-and-filter";
 import {useGraphql} from "~/composables/graphql";
 
@@ -75,7 +73,7 @@ const {
 } = usePageAndFilter()
 
 const
-    dialog = ref({
+    confirmDialogConfig = reactive({
       opened: false,
       text: ''
     }),
@@ -131,11 +129,11 @@ function addProduct() {
 }
 function askConfirmDeleteProduct(product) {
   productIdForDelete.value = product.id
-  dialog.value.text = `Удалить товар ${product.name}?`
-  dialog.value.opened = true
+  confirmDialogConfig.text = `Удалить товар ${product.name}?`
+  confirmDialogConfig.opened = true
 }
 async function deleteProduct() {
-  dialog.value.opened = false
+  confirmDialogConfig.opened = false
   const {errors} = await useGraphql({
     type: 'mutation',
     name: 'deleteProduct',
@@ -151,6 +149,6 @@ async function deleteProduct() {
   }
 }
 function cancelDeleteProduct() {
-  dialog.value.opened = false
+  confirmDialogConfig.opened = false
 }
 </script>
