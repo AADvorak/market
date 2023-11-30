@@ -28,13 +28,14 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="p in products.data" style="cursor: pointer" @click="showProduct(p)">
-              <td>{{ p.id }}</td>
-              <td>{{ p.vendorCode }}</td>
-              <td>{{ p.name }}</td>
-              <td>{{ p.description }}</td>
+            <tr v-for="product in products.data" :key="product.id"
+                style="cursor: pointer" @click="showProduct(product)">
+              <td>{{ product.id }}</td>
+              <td>{{ product.vendorCode }}</td>
+              <td>{{ product.name }}</td>
+              <td>{{ product.description }}</td>
               <td class="text-right" v-if="user.isAdmin">
-                <v-icon @click.stop="askConfirmDeleteProduct(p)">
+                <v-icon @click.stop="askConfirmDeleteProduct(product)">
                   {{ mdiDelete }}
                 </v-icon>
               </td>

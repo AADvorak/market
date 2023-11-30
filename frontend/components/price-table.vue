@@ -12,11 +12,11 @@
     </tr>
     </thead>
     <tbody>
-    <tr v-for="p in prices.data" style="cursor: pointer" @click="editPrice(p)">
-      <td>{{ p.shopName }}</td>
-      <td>{{ p.price }}</td>
+    <tr v-for="price in prices.data" :key="price.id" style="cursor: pointer" @click="editPrice(price)">
+      <td>{{ price.shopName }}</td>
+      <td>{{ price.price }}</td>
       <td class="text-right" v-if="user.isAdmin">
-        <v-icon @click.stop="askConfirmDeletePrice(p)">
+        <v-icon @click.stop="askConfirmDeletePrice(price)">
           {{ mdiDelete }}
         </v-icon>
       </td>
