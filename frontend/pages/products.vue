@@ -28,7 +28,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="p in products.data" @click="showProduct(p)">
+            <tr v-for="p in products.data" style="cursor: pointer" @click="showProduct(p)">
               <td>{{ p.id }}</td>
               <td>{{ p.vendorCode }}</td>
               <td>{{ p.name }}</td>

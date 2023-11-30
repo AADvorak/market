@@ -22,7 +22,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr v-for="s in shops.data" @click="selectRow(s)">
+        <tr v-for="s in shops.data" style="cursor: pointer" @click="selectRow(s)">
           <td>{{ s.id }}</td>
           <td>{{ s.name }}</td>
           <td>{{ s.description }}</td>
