@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia'
+import {defineStore} from 'pinia'
 import {User} from "~/data/model";
 import {useGraphql} from "~/composables/graphql"
 
@@ -22,13 +22,13 @@ export const useUser = defineStore('user', {
   },
   actions: {
     async load() {
-      const {data} = await useGraphql({
-        name: 'getUserInfo',
-        responseFields: ['firstName', 'lastName', 'email', 'roles']
+      await useGraphql<User>({
+        request: {
+          name: 'getUserInfo',
+          responseFields: ['firstName', 'lastName', 'email', 'roles']
+        },
+        dataHandler: data => this.user = data
       })
-      if (data) {
-        this.user = data
-      }
     },
     clear() {
       this.user = User.empty()

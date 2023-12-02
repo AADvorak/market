@@ -29,15 +29,15 @@
       </v-card-text>
     </v-card>
   </v-dialog>
-  <message-dialog :config="messageDialogConfig" @hide="hideMessage"/>
+  <message-dialog ref="message"/>
 </template>
 
 <script setup lang="ts">
 import type {Emitter} from "mitt";
 import {Price} from "~/data/model";
-import {DialogConfig} from "~/data/props";
 import {useGraphql} from "~/composables/graphql";
 import {useFillValidation} from "~/composables/fill-validation";
+import MessageDialog from "~/components/message-dialog.vue";
 
 class PriceValidation {
   constructor(public price: string[], public shopId: string[]) {}
@@ -57,7 +57,7 @@ const
     validation = ref<PriceValidation>(PriceValidation.empty()),
     editedPrice = ref<Price>(Price.empty()),
     modelPrice = ref<string>(''),
-    messageDialogConfig = reactive<DialogConfig>(DialogConfig.default())
+    message = ref<InstanceType<typeof MessageDialog> | null>(null)
 
 props.bus.on('edit-price', (price: Price) => {
   editedPrice.value = price
@@ -75,6 +75,19 @@ async function savePrice() {
     return
   }
   editedPrice.value.price = parseFloat(modelPrice.value)
+  await useGraphql({
+    request: buildSavePriceRequest(),
+    successHandler: hideAndFetchPrices,
+    graphqlErrorsHandler: errors => {
+      useFillValidation(validation.value, errors)
+      if (validation.value.shopId.length) {
+        message.value?.show('Цена для выбранного магазина уже задана')
+        hideAndFetchPrices()
+      }
+    }
+  })
+}
+function buildSavePriceRequest() {
   const {id, shopId, price} = editedPrice.value
   let input, name, responseFields
   if (id) {
@@ -98,22 +111,13 @@ async function savePrice() {
     name = 'addPrice'
     responseFields = ['id', 'shopId', 'shopName', 'price']
   }
-  const {errors} = await useGraphql({
+  return {
     name,
     type: 'mutation',
     variables: {
       input
     },
     responseFields
-  })
-  if (errors.length) {
-    useFillValidation(validation.value, errors)
-    if (validation.value.shopId.length) {
-      showMessage('Цена для выбранного магазина уже задана')
-      hideAndFetchPrices()
-    }
-  } else {
-    hideAndFetchPrices()
   }
 }
 function hideAndFetchPrices() {
@@ -122,13 +126,6 @@ function hideAndFetchPrices() {
 }
 function resetValidation() {
   validation.value = PriceValidation.empty()
-}
-function showMessage(text: string) {
-  messageDialogConfig.opened = true
-  messageDialogConfig.text = text
-}
-function hideMessage() {
-  messageDialogConfig.opened = false
 }
 function show() {
   opened.value = true

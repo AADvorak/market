@@ -21,13 +21,23 @@
 </template>
 
 <script setup lang="ts">
-import type {DialogProps} from "~/data/props";
+import {DialogConfig} from "~/data/props";
 
-defineProps<DialogProps>()
+const config = reactive(DialogConfig.default())
 
 const emits = defineEmits(['hide'])
 
+function show(text: string) {
+  config.text = text
+  config.opened = true
+}
+
 function hide() {
+  config.opened = false
   emits('hide')
 }
+
+defineExpose({
+  show
+})
 </script>

@@ -65,7 +65,13 @@ function editPrice(price: Price) {
   }
 }
 async function fetchPrices() {
-  const {data} = await useGraphql({
+  await useGraphql<DataWithCounts<Price>>({
+    request: buildPricesRequest(),
+    dataHandler: data => prices.value = data
+  })
+}
+function buildPricesRequest() {
+  return {
     name: 'prices',
     variables: {
       productId: {
@@ -84,9 +90,6 @@ async function fetchPrices() {
     responseFields: ['elements', 'pages', {
       'data': ['id', 'shopId', 'shopName', 'price']
     }]
-  })
-  if (data) {
-    prices.value = data
   }
 }
 function askConfirmDeletePrice(price: Price) {
@@ -96,7 +99,13 @@ function askConfirmDeletePrice(price: Price) {
 }
 async function deletePrice() {
   confirmDialogConfig.opened = false
-  const {errors} = await useGraphql({
+  await useGraphql({
+    request: buildDeletePriceRequest(),
+    successHandler: fetchPrices
+  })
+}
+function buildDeletePriceRequest() {
+  return {
     type: 'mutation',
     name: 'deletePrice',
     variables: {
@@ -105,9 +114,6 @@ async function deletePrice() {
         type: 'ID!'
       }
     }
-  })
-  if (!errors.length) {
-    await fetchPrices()
   }
 }
 function cancelDeletePrice() {

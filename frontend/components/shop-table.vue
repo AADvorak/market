@@ -74,34 +74,34 @@ onMounted(() => {
 })
 
 async function fetchShops() {
-  const {data} = await useGraphql({
-    type: 'query',
-    name: 'shops',
-    variables: {
-      filter: {
-        value: filter.value,
-        type: 'String'
+  await useGraphql({
+    request: {
+      type: 'query',
+      name: 'shops',
+      variables: {
+        filter: {
+          value: filter.value,
+          type: 'String'
+        },
+        excludeProductId: {
+          value: props.excludeProductId || 0,
+          type: 'Int'
+        },
+        page: {
+          value: currentPage.value - 1,
+          type: 'Int!'
+        },
+        size: {
+          value: 5,
+          type: 'Int!'
+        }
       },
-      excludeProductId: {
-        value: props.excludeProductId || 0,
-        type: 'Int'
-      },
-      page: {
-        value: currentPage.value - 1,
-        type: 'Int!'
-      },
-      size: {
-        value: 5,
-        type: 'Int!'
-      }
+      responseFields: ['elements', 'pages', {
+        'data': ['id', 'name', 'description']
+      }]
     },
-    responseFields: ['elements', 'pages', {
-      'data': ['id', 'name', 'description']
-    }]
+    dataHandler: data => shops.value = data
   })
-  if (data) {
-    shops.value = data
-  }
 }
 function setFilter(value) {
   filter.value = value

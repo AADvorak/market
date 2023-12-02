@@ -59,7 +59,17 @@ const
     product = ref<Product>(Product.empty())
 
 async function fetchProduct(productId: number) {
-  const {data} = await useGraphql({
+  await useGraphql<Product>({
+    request: buildProductRequest(productId),
+    dataHandler: data => {
+      product.value = data
+      props.bus.emit('product-loaded', product.value)
+    },
+  })
+}
+
+function buildProductRequest(productId: number) {
+  return {
     name: 'product',
     variables: {
       id: {
@@ -68,53 +78,53 @@ async function fetchProduct(productId: number) {
       }
     },
     responseFields: ['id', 'vendorCode', 'name', 'description']
-  })
-  if (data) {
-    product.value = data
-    props.bus.emit('product-loaded', product.value)
   }
 }
+
 async function saveProduct() {
   resetValidation()
-  if (product.value.id) {
-    const {errors} = await useGraphql({
-      name: 'editProduct',
-      type: 'mutation',
-      variables: {
-        input: {
-          value: product.value,
-          type: 'EditProductDtoRequest!'
-        }
-      },
-      responseFields: []
-    })
-    if (errors.length) {
-      useFillValidation(validation.value, errors)
-    }
-  } else {
-    const {data, errors} = await useGraphql({
-      name: 'addProduct',
-      type: 'mutation',
-      variables: {
-        input: {
-          value: {
-            vendorCode: product.value.vendorCode,
-            name: product.value.name,
-            description: product.value.description,
-          },
-          type: 'ProductDtoRequest!'
-        }
-      },
-      responseFields: ['id', 'vendorCode', 'name', 'description']
-    })
-    if (errors.length) {
-      useFillValidation(validation.value, errors)
-    } else if (data) {
+  await useGraphql<Product>({
+    request: product.value.id ? buildEditProductRequest() : buildAddProductRequest(),
+    dataHandler: data => {
       product.value = data
       props.bus.emit('product-saved', product.value)
-    }
+    },
+    graphqlErrorsHandler: errors => useFillValidation(validation.value, errors)
+  })
+}
+
+function buildEditProductRequest() {
+  return {
+    name: 'editProduct',
+    type: 'mutation',
+    variables: {
+      input: {
+        value: product.value,
+        type: 'EditProductDtoRequest!'
+      }
+    },
+    responseFields: []
   }
 }
+
+function buildAddProductRequest() {
+  return {
+    name: 'addProduct',
+    type: 'mutation',
+    variables: {
+      input: {
+        value: {
+          vendorCode: product.value.vendorCode,
+          name: product.value.name,
+          description: product.value.description,
+        },
+        type: 'ProductDtoRequest!'
+      }
+    },
+    responseFields: ['id', 'vendorCode', 'name', 'description']
+  }
+}
+
 function resetValidation() {
   validation.value = ProductValidation.empty()
 }

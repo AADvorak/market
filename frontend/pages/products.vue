@@ -53,6 +53,7 @@
           :config="confirmDialogConfig"
           @ok="deleteProduct"
           @cancel="cancelDeleteProduct"/>
+      <message-dialog ref="message"/>
     </div>
   </NuxtLayout>
 </template>
@@ -62,6 +63,7 @@ import {useUser} from "~/stores/user";
 import {mdiDelete} from "@mdi/js";
 import {usePageAndFilter} from "~/composables/page-and-filter";
 import {useGraphql} from "~/composables/graphql";
+import MessageDialog from "~/components/message-dialog.vue";
 
 const user = useUser()
 
@@ -83,7 +85,8 @@ const
       elements: 0,
       pages: 0,
       data: []
-    })
+    }),
+    message = ref(null)
 
 watch([currentPage, filter], () => {
   setUrlParams()
@@ -97,30 +100,35 @@ onMounted(() => {
 })
 
 async function fetchProducts() {
-  const {data} = await useGraphql({
-    type: 'query',
-    name: 'products',
-    variables: {
-      filter: {
-        value: filter.value,
-        type: 'String'
+  await useGraphql({
+    request: {
+      type: 'query',
+      name: 'products',
+      variables: {
+        filter: {
+          value: filter.value,
+          type: 'String'
+        },
+        page: {
+          value: currentPage.value - 1,
+          type: 'Int!'
+        },
+        size: {
+          value: 5,
+          type: 'Int!'
+        }
       },
-      page: {
-        value: currentPage.value - 1,
-        type: 'Int!'
-      },
-      size: {
-        value: 5,
-        type: 'Int!'
-      }
+      responseFields: ['elements', 'pages', {
+        'data': ['id', 'vendorCode', 'name', 'description']
+      }]
     },
-    responseFields: ['elements', 'pages', {
-      'data': ['id', 'vendorCode', 'name', 'description']
-    }]
+    dataHandler: data => products.value = data,
+    graphqlErrorsHandler: showErrorMessage,
+    requestErrorHandler: showErrorMessage
   })
-  if (data) {
-    products.value = data
-  }
+}
+function showErrorMessage() {
+  message.value?.show('Ошибка при загрузке продуктов')
 }
 function showProduct(p) {
   useRouter().push('/product/' + p.id)
@@ -135,7 +143,13 @@ function askConfirmDeleteProduct(product) {
 }
 async function deleteProduct() {
   confirmDialogConfig.opened = false
-  const {errors} = await useGraphql({
+  await useGraphql({
+    request: buildDeleteProductRequest(),
+    successHandler: fetchProducts
+  })
+}
+function buildDeleteProductRequest() {
+  return {
     type: 'mutation',
     name: 'deleteProduct',
     variables: {
@@ -144,9 +158,6 @@ async function deleteProduct() {
         type: 'ID!'
       }
     }
-  })
-  if (!errors.length) {
-    await fetchProducts()
   }
 }
 function cancelDeleteProduct() {
