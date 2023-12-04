@@ -101,34 +101,35 @@ onMounted(() => {
 
 async function fetchProducts() {
   await useGraphql({
-    request: {
-      type: 'query',
-      name: 'products',
-      variables: {
-        filter: {
-          value: filter.value,
-          type: 'String'
-        },
-        page: {
-          value: currentPage.value - 1,
-          type: 'Int!'
-        },
-        size: {
-          value: 5,
-          type: 'Int!'
-        }
-      },
-      responseFields: ['elements', 'pages', {
-        'data': ['id', 'vendorCode', 'name', 'description']
-      }]
-    },
+    request: buildProductsRequest(),
     dataHandler: data => products.value = data,
-    graphqlErrorsHandler: showErrorMessage,
-    requestErrorHandler: showErrorMessage
+    failHandler() {
+      message.value?.show('Ошибка при загрузке продуктов')
+    }
   })
 }
-function showErrorMessage() {
-  message.value?.show('Ошибка при загрузке продуктов')
+function buildProductsRequest() {
+  return {
+    type: 'query',
+    name: 'products',
+    variables: {
+      filter: {
+        value: filter.value,
+        type: 'String'
+      },
+      page: {
+        value: currentPage.value - 1,
+        type: 'Int!'
+      },
+      size: {
+        value: 5,
+        type: 'Int!'
+      }
+    },
+    responseFields: ['elements', 'pages', {
+      'data': ['id', 'vendorCode', 'name', 'description']
+    }]
+  }
 }
 function showProduct(p) {
   useRouter().push('/product/' + p.id)

@@ -35,6 +35,7 @@
           :length="shops.pages"/>
     </v-card-text>
   </v-card>
+  <message-dialog ref="message"/>
 </template>
 
 <script setup>
@@ -56,7 +57,8 @@ const
       elements: 0,
       pages: 0,
       data: []
-    })
+    }),
+    message = ref(null)
 
 watch(currentPage, () => {
   emits('current-page', currentPage.value)
@@ -75,33 +77,39 @@ onMounted(() => {
 
 async function fetchShops() {
   await useGraphql({
-    request: {
-      type: 'query',
-      name: 'shops',
-      variables: {
-        filter: {
-          value: filter.value,
-          type: 'String'
-        },
-        excludeProductId: {
-          value: props.excludeProductId || 0,
-          type: 'Int'
-        },
-        page: {
-          value: currentPage.value - 1,
-          type: 'Int!'
-        },
-        size: {
-          value: 5,
-          type: 'Int!'
-        }
-      },
-      responseFields: ['elements', 'pages', {
-        'data': ['id', 'name', 'description']
-      }]
+    request: buildShopsRequest(),
+    dataHandler: data => shops.value = data,
+    failHandler() {
+      message.value?.show('Ошибка при загрузке магазинов')
     },
-    dataHandler: data => shops.value = data
   })
+}
+function buildShopsRequest() {
+  return {
+    type: 'query',
+    name: 'shops',
+    variables: {
+      filter: {
+        value: filter.value,
+        type: 'String'
+      },
+      excludeProductId: {
+        value: props.excludeProductId || 0,
+        type: 'Int'
+      },
+      page: {
+        value: currentPage.value - 1,
+        type: 'Int!'
+      },
+      size: {
+        value: 5,
+        type: 'Int!'
+      }
+    },
+    responseFields: ['elements', 'pages', {
+      'data': ['id', 'name', 'description']
+    }]
+  }
 }
 function setFilter(value) {
   filter.value = value

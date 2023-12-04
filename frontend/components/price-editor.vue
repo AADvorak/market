@@ -84,7 +84,10 @@ async function savePrice() {
         message.value?.show('Цена для выбранного магазина уже задана')
         hideAndFetchPrices()
       }
-    }
+    },
+    failHandler() {
+      message.value?.show('Ошибка при загрузке продукта')
+    },
   })
 }
 function buildSavePriceRequest() {

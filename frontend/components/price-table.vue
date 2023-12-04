@@ -30,6 +30,7 @@
       :config="confirmDialogConfig"
       @ok="deletePrice"
       @cancel="cancelDeletePrice"/>
+  <message-dialog ref="message"/>
 </template>
 
 <script setup lang="ts">
@@ -39,6 +40,7 @@ import type {Emitter} from "mitt";
 import {DataWithCounts, Price} from "~/data/model";
 import {DialogConfig} from "~/data/props";
 import {useGraphql} from "~/composables/graphql";
+import MessageDialog from "~/components/message-dialog.vue";
 
 const user = useUser()
 
@@ -53,7 +55,8 @@ const
     priceIdForDelete = ref<number>(0),
     currentPage = ref<number>(1),
     prices = ref<DataWithCounts<Price>>(DataWithCounts.empty()),
-    confirmDialogConfig = reactive<DialogConfig>(DialogConfig.default())
+    confirmDialogConfig = reactive<DialogConfig>(DialogConfig.default()),
+    message = ref<InstanceType<typeof MessageDialog> | null>(null)
 
 watch([() => props.productId, currentPage], fetchPrices)
 
@@ -67,7 +70,10 @@ function editPrice(price: Price) {
 async function fetchPrices() {
   await useGraphql<DataWithCounts<Price>>({
     request: buildPricesRequest(),
-    dataHandler: data => prices.value = data
+    dataHandler: data => prices.value = data,
+    failHandler() {
+      message.value?.show('Ошибка при загрузке цен')
+    },
   })
 }
 function buildPricesRequest() {
@@ -101,7 +107,10 @@ async function deletePrice() {
   confirmDialogConfig.opened = false
   await useGraphql({
     request: buildDeletePriceRequest(),
-    successHandler: fetchPrices
+    successHandler: fetchPrices,
+    failHandler() {
+      message.value?.show('Ошибка при удалении цены')
+    },
   })
 }
 function buildDeletePriceRequest() {

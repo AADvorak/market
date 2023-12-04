@@ -25,6 +25,7 @@
       Сохранить
     </v-btn>
   </v-form>
+  <message-dialog ref="message"/>
 </template>
 
 <script setup lang="ts">
@@ -33,6 +34,7 @@ import {Product} from "~/data/model";
 import type {Emitter} from "mitt";
 import {useGraphql} from "~/composables/graphql";
 import {useFillValidation} from "~/composables/fill-validation";
+import MessageDialog from "~/components/message-dialog.vue";
 
 const user = useUser()
 
@@ -56,7 +58,8 @@ props.bus.on('fetch-product', fetchProduct)
 
 const
     validation = ref<ProductValidation>(ProductValidation.empty()),
-    product = ref<Product>(Product.empty())
+    product = ref<Product>(Product.empty()),
+    message = ref<InstanceType<typeof MessageDialog> | null>(null)
 
 async function fetchProduct(productId: number) {
   await useGraphql<Product>({
@@ -64,6 +67,9 @@ async function fetchProduct(productId: number) {
     dataHandler: data => {
       product.value = data
       props.bus.emit('product-loaded', product.value)
+    },
+    failHandler() {
+      message.value?.show('Ошибка при загрузке продукта')
     },
   })
 }
@@ -89,7 +95,10 @@ async function saveProduct() {
       product.value = data
       props.bus.emit('product-saved', product.value)
     },
-    graphqlErrorsHandler: errors => useFillValidation(validation.value, errors)
+    graphqlErrorsHandler: errors => useFillValidation(validation.value, errors),
+    failHandler() {
+      message.value?.show('Ошибка при сохранении продукта')
+    },
   })
 }
 
