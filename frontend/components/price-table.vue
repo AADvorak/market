@@ -26,10 +26,7 @@
   <v-pagination
       v-model="currentPage"
       :length="prices.pages"/>
-  <confirm-dialog
-      :config="confirmDialogConfig"
-      @ok="deletePrice"
-      @cancel="cancelDeletePrice"/>
+  <confirm-dialog ref="confirm"/>
   <message-dialog ref="message"/>
 </template>
 
@@ -38,9 +35,9 @@ import {useUser} from "~/stores/user";
 import {mdiDelete} from "@mdi/js";
 import type {Emitter} from "mitt";
 import {DataWithCounts, Price} from "~/data/model";
-import {DialogConfig} from "~/data/props";
 import {useGraphql} from "~/composables/graphql";
 import MessageDialog from "~/components/message-dialog.vue";
+import ConfirmDialog from "~/components/confirm-dialog.vue";
 
 const user = useUser()
 
@@ -52,11 +49,10 @@ const props = defineProps<{
 props.bus.on('fetch-prices', fetchPrices)
 
 const
-    priceIdForDelete = ref<number>(0),
     currentPage = ref<number>(1),
     prices = ref<DataWithCounts<Price>>(DataWithCounts.empty()),
-    confirmDialogConfig = reactive<DialogConfig>(DialogConfig.default()),
-    message = ref<InstanceType<typeof MessageDialog> | null>(null)
+    message = ref<InstanceType<typeof MessageDialog> | null>(null),
+    confirm = ref<InstanceType<typeof ConfirmDialog> | null>(null)
 
 watch([() => props.productId, currentPage], fetchPrices)
 
@@ -99,33 +95,27 @@ function buildPricesRequest() {
   }
 }
 function askConfirmDeletePrice(price: Price) {
-  priceIdForDelete.value = price.id
-  confirmDialogConfig.text = `Удалить цену товара в магазине ${price.shopName}?`
-  confirmDialogConfig.opened = true
+  confirm.value?.show(`Удалить цену товара в магазине ${price.shopName}?`, () => deletePrice(price.id))
 }
-async function deletePrice() {
-  confirmDialogConfig.opened = false
+async function deletePrice(priceId: number) {
   await useGraphql({
-    request: buildDeletePriceRequest(),
+    request: buildDeletePriceRequest(priceId),
     successHandler: fetchPrices,
     failHandler() {
       message.value?.show('Ошибка при удалении цены')
     },
   })
 }
-function buildDeletePriceRequest() {
+function buildDeletePriceRequest(priceId: number) {
   return {
     type: 'mutation',
     name: 'deletePrice',
     variables: {
       id: {
-        value: priceIdForDelete.value,
+        value: priceId,
         type: 'ID!'
       }
     }
   }
-}
-function cancelDeletePrice() {
-  confirmDialogConfig.opened = false
 }
 </script>

@@ -49,10 +49,7 @@
           <v-btn v-if="user.isAdmin" @click="addProduct">Добавить товар</v-btn>
         </v-card-text>
       </v-card>
-      <confirm-dialog
-          :config="confirmDialogConfig"
-          @ok="deleteProduct"
-          @cancel="cancelDeleteProduct"/>
+      <confirm-dialog ref="confirm"/>
       <message-dialog ref="message"/>
     </div>
   </NuxtLayout>
@@ -76,17 +73,13 @@ const {
 } = usePageAndFilter()
 
 const
-    confirmDialogConfig = reactive({
-      opened: false,
-      text: ''
-    }),
-    productIdForDelete = ref(0),
     products = ref({
       elements: 0,
       pages: 0,
       data: []
     }),
-    message = ref(null)
+    message = ref(null),
+    confirm = ref(null)
 
 watch([currentPage, filter], () => {
   setUrlParams()
@@ -138,30 +131,24 @@ function addProduct() {
   useRouter().push('/product/0')
 }
 function askConfirmDeleteProduct(product) {
-  productIdForDelete.value = product.id
-  confirmDialogConfig.text = `Удалить товар ${product.name}?`
-  confirmDialogConfig.opened = true
+  confirm.value?.show(`Удалить товар ${product.name}?`, () => deleteProduct(product.id))
 }
-async function deleteProduct() {
-  confirmDialogConfig.opened = false
+async function deleteProduct(productId) {
   await useGraphql({
-    request: buildDeleteProductRequest(),
+    request: buildDeleteProductRequest(productId),
     successHandler: fetchProducts
   })
 }
-function buildDeleteProductRequest() {
+function buildDeleteProductRequest(productId) {
   return {
     type: 'mutation',
     name: 'deleteProduct',
     variables: {
       id: {
-        value: productIdForDelete.value,
+        value: productId,
         type: 'ID!'
       }
     }
   }
-}
-function cancelDeleteProduct() {
-  confirmDialogConfig.opened = false
 }
 </script>

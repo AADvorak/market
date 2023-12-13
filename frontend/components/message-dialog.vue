@@ -1,6 +1,6 @@
 <template>
   <v-dialog
-      :model-value="config.opened"
+      :model-value="model.opened"
       :persistent="true"
       max-width="600px"
   >
@@ -8,7 +8,7 @@
       <v-card-title>Сообщение</v-card-title>
       <v-card-text>
         <div class="d-flex">
-          {{ config.text }}
+          {{ model.text }}
         </div>
         <div class="d-flex mt-4">
           <v-btn @click="hide">
@@ -21,20 +21,18 @@
 </template>
 
 <script setup lang="ts">
-import {DialogConfig} from "~/data/props";
-
-const config = reactive(DialogConfig.default())
-
-const emits = defineEmits(['hide'])
+const model = reactive({
+  opened: false,
+  text: ''
+})
 
 function show(text: string) {
-  config.text = text
-  config.opened = true
+  model.text = text
+  model.opened = true
 }
 
 function hide() {
-  config.opened = false
-  emits('hide')
+  model.opened = false
 }
 
 defineExpose({
