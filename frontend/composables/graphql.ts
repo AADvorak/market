@@ -17,7 +17,7 @@ export async function useGraphql<T>(params: GraphqlParams<T>) {
     if (response.errors) {
       handleGraphqlErrors(response.errors, params)
     } else {
-      successHandler<T>(response.data, params)
+      handleSuccess<T>(response.data, params)
     }
   } catch (e: any) {
     if (e.status === 401) {
@@ -45,7 +45,7 @@ function handleRequestError<T>(e: any, params: GraphqlParams<T>) {
   }
 }
 
-function successHandler<T>(data: any, params: GraphqlParams<T>) {
+function handleSuccess<T>(data: any, params: GraphqlParams<T>) {
   if (params.dataHandler) {
     if (data && data[params.request.name]) {
       params.dataHandler(<T>data[params.request.name])
