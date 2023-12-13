@@ -29,7 +29,7 @@
             </thead>
             <tbody>
             <tr v-for="product in products.data" :key="product.id"
-                style="cursor: pointer" @click="showProduct(product)">
+                style="cursor: pointer" @click="showProduct(product.id)">
               <td>{{ product.id }}</td>
               <td>{{ product.vendorCode }}</td>
               <td>{{ product.name }}</td>
@@ -131,8 +131,8 @@ function buildProductsRequest() {
     }]
   }
 }
-function showProduct(p) {
-  useRouter().push('/product/' + p.id)
+function showProduct(id) {
+  useRouter().push('/product/' + id)
 }
 function addProduct() {
   useRouter().push('/product/0')

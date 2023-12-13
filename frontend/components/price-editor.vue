@@ -10,6 +10,7 @@
         <v-form @submit.prevent="savePrice">
           <v-text-field
               v-model="modelPrice"
+              ref="priceField"
               type="number"
               step="10"
               min="0"
@@ -18,7 +19,7 @@
               :error-messages="validation.price"
               required/>
           <div class="d-flex">
-            <v-btn color="success" class="mr-4" @click="savePrice">
+            <v-btn type="submit" color="success" class="mr-4">
               OK
             </v-btn>
             <v-btn @click="hide">
@@ -57,7 +58,8 @@ const
     validation = ref<PriceValidation>(PriceValidation.empty()),
     editedPrice = ref<Price>(Price.empty()),
     modelPrice = ref<string>(''),
-    message = ref<InstanceType<typeof MessageDialog> | null>(null)
+    message = ref<InstanceType<typeof MessageDialog> | null>(null),
+    priceField = ref<HTMLInputElement | null>(null)
 
 props.bus.on('edit-price', (price: Price) => {
   editedPrice.value = price
@@ -66,6 +68,10 @@ props.bus.on('edit-price', (price: Price) => {
   }
   resetValidation()
   show()
+})
+
+watch(priceField, () => {
+  priceField.value?.focus()
 })
 
 async function savePrice() {
