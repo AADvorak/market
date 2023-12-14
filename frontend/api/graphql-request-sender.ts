@@ -5,7 +5,7 @@ interface VariableValues {
   [index: string]: any
 }
 
-export class GraphqlRequestSender {
+export class GraphqlRequestSender<T> {
 
   PATH = '/graphql'
   name: string
@@ -20,7 +20,7 @@ export class GraphqlRequestSender {
     this.responseFields = request.responseFields ? request.responseFields : []
   }
 
-  async send(): Promise<GraphqlResponse> {
+  async send(): Promise<GraphqlResponse<T>> {
     const query = this._makeQuery()
     const variables = this._makeVariablesValues()
     return await $fetch(this.PATH, {

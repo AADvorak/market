@@ -1,19 +1,20 @@
 import type {GraphqlRequest} from "~/data/request";
 import {GraphqlRequestSender} from "~/api/graphql-request-sender";
 import {useUser} from "~/stores/user";
+import type {GraphqlData, GraphqlError} from "~/data/response";
 
 interface GraphqlParams<T> {
   request: GraphqlRequest
   successHandler?: () => void
   failHandler?: () => void
   dataHandler?: (data: T) => void
-  graphqlErrorsHandler?: (errors: any[]) => void
+  graphqlErrorsHandler?: (errors: GraphqlError[]) => void
   requestErrorHandler?: (error: any) => void
 }
 
 export async function useGraphql<T>(params: GraphqlParams<T>) {
   try {
-    const response = await new GraphqlRequestSender(params.request).send()
+    const response = await new GraphqlRequestSender<T>(params.request).send()
     if (response.errors) {
       handleGraphqlErrors(response.errors, params)
     } else {
@@ -29,7 +30,7 @@ export async function useGraphql<T>(params: GraphqlParams<T>) {
   }
 }
 
-function handleGraphqlErrors<T>(errors: any[], params: GraphqlParams<T>) {
+function handleGraphqlErrors<T>(errors: GraphqlError[], params: GraphqlParams<T>) {
   if (params.graphqlErrorsHandler) {
     params.graphqlErrorsHandler(errors)
   } else if (params.failHandler) {
@@ -45,10 +46,11 @@ function handleRequestError<T>(e: any, params: GraphqlParams<T>) {
   }
 }
 
-function handleSuccess<T>(data: any, params: GraphqlParams<T>) {
+function handleSuccess<T>(data: GraphqlData<T> | undefined, params: GraphqlParams<T>) {
   if (params.dataHandler) {
-    if (data && data[params.request.name]) {
-      params.dataHandler(<T>data[params.request.name])
+    if (data) {
+      const entity = data[params.request.name]
+      entity && params.dataHandler(entity)
     }
   } else if (params.successHandler) {
     params.successHandler()
