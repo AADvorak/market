@@ -21,12 +21,6 @@ import {useDarkMode} from "~/composables/dark-mode";
 const {darkMode, theme} = useDarkMode()
 const user = useUser()
 
-onMounted(() => {
-  if (!user.user.email) {
-    user.load()
-  }
-})
-
 function logout() {
   user.clear()
   window.open(
