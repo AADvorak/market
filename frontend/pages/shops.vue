@@ -1,13 +1,11 @@
 <template>
-  <NuxtLayout name="authenticated">
-    <div class="d-flex align-center flex-column">
-      <shop-table
-          :init-current-page="currentPage"
-          :init-filter="filter"
-          @filter="setFilter"
-          @currentPage="setCurrentPage"/>
-    </div>
-  </NuxtLayout>
+  <div class="d-flex align-center flex-column">
+    <shop-table
+        :init-current-page="currentPage"
+        :init-filter="filter"
+        @filter="setFilter"
+        @currentPage="setCurrentPage"/>
+  </div>
 </template>
 
 <script setup>

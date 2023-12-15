@@ -1,58 +1,56 @@
 <template>
-  <NuxtLayout name="authenticated">
-    <div class="d-flex align-center flex-column">
-      <v-card width="100%">
-        <v-card-title>Товары</v-card-title>
-        <v-card-text>
-          <p>
-            <span>Всего: страниц {{ products.pages }}, </span>
-            <span>записей {{ products.elements }}</span>
-          </p>
-          <search-field :init-search-value="filter" @search="setFilter"/>
-          <v-table>
-            <thead>
-            <tr>
-              <th class="text-left">
-                id
-              </th>
-              <th class="text-left">
-                Артикул
-              </th>
-              <th class="text-left">
-                Название
-              </th>
-              <th class="text-left">
-                Описание
-              </th>
-              <th v-if="user.isAdmin" class="text-right"/>
-            </tr>
-            </thead>
-            <tbody>
-            <tr v-for="product in products.data" :key="product.id"
-                style="cursor: pointer" @click="showProduct(product.id)">
-              <td>{{ product.id }}</td>
-              <td>{{ product.vendorCode }}</td>
-              <td>{{ product.name }}</td>
-              <td>{{ product.description }}</td>
-              <td class="text-right" v-if="user.isAdmin">
-                <v-icon @click.stop="askConfirmDeleteProduct(product)">
-                  {{ mdiDelete }}
-                </v-icon>
-              </td>
-            </tr>
-            </tbody>
-          </v-table>
-          <v-pagination
-              v-model="currentPage"
-              :length="products.pages"
-          ></v-pagination>
-          <v-btn v-if="user.isAdmin" @click="addProduct">Добавить товар</v-btn>
-        </v-card-text>
-      </v-card>
-      <confirm-dialog ref="confirm"/>
-      <message-dialog ref="message"/>
-    </div>
-  </NuxtLayout>
+  <div class="d-flex align-center flex-column">
+    <v-card width="100%">
+      <v-card-title>Товары</v-card-title>
+      <v-card-text>
+        <p>
+          <span>Всего: страниц {{ products.pages }}, </span>
+          <span>записей {{ products.elements }}</span>
+        </p>
+        <search-field :init-search-value="filter" @search="setFilter"/>
+        <v-table>
+          <thead>
+          <tr>
+            <th class="text-left">
+              id
+            </th>
+            <th class="text-left">
+              Артикул
+            </th>
+            <th class="text-left">
+              Название
+            </th>
+            <th class="text-left">
+              Описание
+            </th>
+            <th v-if="user.isAdmin" class="text-right"/>
+          </tr>
+          </thead>
+          <tbody>
+          <tr v-for="product in products.data" :key="product.id"
+              style="cursor: pointer" @click="showProduct(product.id)">
+            <td>{{ product.id }}</td>
+            <td>{{ product.vendorCode }}</td>
+            <td>{{ product.name }}</td>
+            <td>{{ product.description }}</td>
+            <td class="text-right" v-if="user.isAdmin">
+              <v-icon @click.stop="askConfirmDeleteProduct(product)">
+                {{ mdiDelete }}
+              </v-icon>
+            </td>
+          </tr>
+          </tbody>
+        </v-table>
+        <v-pagination
+            v-model="currentPage"
+            :length="products.pages"
+        ></v-pagination>
+        <v-btn v-if="user.isAdmin" @click="addProduct">Добавить товар</v-btn>
+      </v-card-text>
+    </v-card>
+    <confirm-dialog ref="confirm"/>
+    <message-dialog ref="message"/>
+  </div>
 </template>
 
 <script setup>

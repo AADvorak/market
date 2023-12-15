@@ -1,42 +1,40 @@
 <template>
-  <NuxtLayout name="authenticated">
-    <div class="d-flex align-center flex-column">
-      <v-container width="100%">
-        <v-row class="mb-4">
-          <v-col :cols="cols" :sm="cols" :md="cols">
-            <v-card width="100%">
-              <v-card-title>{{ product.name || "Новый товар" }} - информация</v-card-title>
-              <v-card-text>
-                <product-form :bus="bus"/>
-              </v-card-text>
-            </v-card>
-          </v-col>
-          <v-col v-if="!!product.id" cols="6" sm="6" md="6">
-            <v-card width="100%">
-              <v-card-title>Цены в магазинах</v-card-title>
-              <v-card-text>
-                <price-table
-                    :product-id="product.id"
-                    :bus="bus"/>
-                <v-btn v-if="user.isAdmin" @click="showShopTable">
-                  Добавить
-                </v-btn>
-              </v-card-text>
-            </v-card>
-          </v-col>
-        </v-row>
-        <v-row>
-          <shop-table
-              v-if="shopTableOpened"
-              :init-current-page="1"
-              :exclude-product-id="product.id"
-              :init-filter="String()"
-              @selectedRow="addPrice"/>
-        </v-row>
-      </v-container>
-      <price-editor :product-id="product.id" :bus="bus"/>
-    </div>
-  </NuxtLayout>
+  <div class="d-flex align-center flex-column">
+    <v-container width="100%">
+      <v-row class="mb-4">
+        <v-col :cols="cols" :sm="cols" :md="cols">
+          <v-card width="100%">
+            <v-card-title>{{ product.name || "Новый товар" }} - информация</v-card-title>
+            <v-card-text>
+              <product-form :bus="bus"/>
+            </v-card-text>
+          </v-card>
+        </v-col>
+        <v-col v-if="!!product.id" cols="6" sm="6" md="6">
+          <v-card width="100%">
+            <v-card-title>Цены в магазинах</v-card-title>
+            <v-card-text>
+              <price-table
+                  :product-id="product.id"
+                  :bus="bus"/>
+              <v-btn v-if="user.isAdmin" @click="showShopTable">
+                Добавить
+              </v-btn>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+      <v-row>
+        <shop-table
+            v-if="shopTableOpened"
+            :init-current-page="1"
+            :exclude-product-id="product.id"
+            :init-filter="String()"
+            @selectedRow="addPrice"/>
+      </v-row>
+    </v-container>
+    <price-editor :product-id="product.id" :bus="bus"/>
+  </div>
 </template>
 
 <script setup lang="ts">
