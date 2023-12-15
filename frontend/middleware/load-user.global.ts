@@ -7,7 +7,5 @@ export default defineNuxtRouteMiddleware(async (to) => {
   }
   if (!user.user.email) {
     return abortNavigation()
-  } else if (to.path === '/') {
-    return navigateTo('/products')
   }
 })
