@@ -13,13 +13,13 @@
             </v-card-text>
           </v-card>
         </v-col>
-        <v-col v-if="!!product.id" cols="6" sm="6" md="6">
+        <v-col v-if="!!productId" cols="6" sm="6" md="6">
           <v-card width="100%">
             <v-card-title>Цены в магазинах</v-card-title>
             <v-card-text>
               <price-table
                   ref="priceTable"
-                  :product-id="product.id"
+                  :product-id="productId"
                   @edit-price="price => editedPrice = price"/>
               <v-btn v-if="user.isAdmin" @click="showShopTable">
                 Добавить
@@ -32,7 +32,7 @@
         <shop-table
             v-if="shopTableOpened"
             :init-current-page="1"
-            :exclude-product-id="product.id"
+            :exclude-product-id="productId"
             :init-filter="String()"
             @selectedRow="addPrice"/>
       </v-row>
