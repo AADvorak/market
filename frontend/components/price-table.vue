@@ -33,7 +33,6 @@
 <script setup lang="ts">
 import {useUser} from "~/stores/user";
 import {mdiDelete} from "@mdi/js";
-import type {Emitter} from "mitt";
 import {DataWithCounts, Price} from "~/data/model";
 import {useGraphql} from "~/composables/graphql";
 import MessageDialog from "~/components/message-dialog.vue";
@@ -43,10 +42,9 @@ const user = useUser()
 
 const props = defineProps<{
   productId: number
-  bus: Emitter<any>
 }>()
 
-props.bus.on('fetch-prices', fetchPrices)
+const emit = defineEmits(['edit-price'])
 
 const
     currentPage = ref<number>(1),
@@ -60,7 +58,7 @@ onMounted(fetchPrices)
 
 function editPrice(price: Price) {
   if (user.isAdmin) {
-    props.bus.emit('edit-price', price)
+    emit('edit-price', price)
   }
 }
 async function fetchPrices() {
@@ -118,4 +116,8 @@ function buildDeletePriceRequest(priceId: number) {
     }
   }
 }
+
+defineExpose({
+  fetchPrices
+})
 </script>

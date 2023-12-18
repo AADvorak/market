@@ -31,7 +31,6 @@
 <script setup lang="ts">
 import {useUser} from "~/stores/user";
 import {Product} from "~/data/model";
-import type {Emitter} from "mitt";
 import {useGraphql} from "~/composables/graphql";
 import {useFillValidation} from "~/composables/fill-validation";
 import MessageDialog from "~/components/message-dialog.vue";
@@ -51,22 +50,26 @@ class ProductValidation {
 }
 
 const props = defineProps<{
-  bus: Emitter<any>
+  productId: number
 }>()
 
-props.bus.on('fetch-product', fetchProduct)
+const emit = defineEmits(['product-loaded', 'product-saved'])
 
 const
     validation = ref<ProductValidation>(ProductValidation.empty()),
     product = ref<Product>(Product.empty()),
     message = ref<InstanceType<typeof MessageDialog> | null>(null)
 
+watch(() => props.productId, (newValue) => {
+  newValue && fetchProduct(newValue)
+})
+
 async function fetchProduct(productId: number) {
   await useGraphql<Product>({
     request: buildProductRequest(productId),
     dataHandler: data => {
       product.value = data
-      props.bus.emit('product-loaded', product.value)
+      emit('product-loaded', product.value)
     },
     failHandler() {
       message.value?.show('Ошибка при загрузке продукта')
@@ -93,7 +96,7 @@ async function saveProduct() {
     request: product.value.id ? buildEditProductRequest() : buildAddProductRequest(),
     dataHandler: data => {
       product.value = data
-      props.bus.emit('product-saved', product.value)
+      emit('product-saved', product.value)
     },
     graphqlErrorsHandler: errors => useFillValidation(validation.value, errors),
     failHandler() {

@@ -34,7 +34,6 @@
 </template>
 
 <script setup lang="ts">
-import type {Emitter} from "mitt";
 import {Price} from "~/data/model";
 import {useGraphql} from "~/composables/graphql";
 import {useFillValidation} from "~/composables/fill-validation";
@@ -49,29 +48,28 @@ class PriceValidation {
 }
 
 const props = defineProps<{
-  productId: number,
-  bus: Emitter<any>
+  productId: number
+  editedPrice: Price
 }>()
+
+const emit = defineEmits(['price-saved'])
 
 const
     opened = ref<boolean>(false),
     validation = ref<PriceValidation>(PriceValidation.empty()),
-    editedPrice = ref<Price>(Price.empty()),
     modelPrice = ref<string>(''),
     message = ref<InstanceType<typeof MessageDialog> | null>(null),
     priceField = ref<HTMLInputElement | null>(null)
 
-props.bus.on('edit-price', (price: Price) => {
-  editedPrice.value = price
-  if (price.price) {
-    modelPrice.value = price.price.toString()
+watch(priceField, () => {
+  priceField.value?.focus()
+})
+watch(() => props.editedPrice, (newValue) => {
+  if (newValue.price) {
+    modelPrice.value = newValue.price.toString()
   }
   resetValidation()
   show()
-})
-
-watch(priceField, () => {
-  priceField.value?.focus()
 })
 
 async function savePrice() {
@@ -80,7 +78,7 @@ async function savePrice() {
     validation.value.price = ['укажите цену']
     return
   }
-  editedPrice.value.price = parseFloat(modelPrice.value)
+  props.editedPrice.price = parseFloat(modelPrice.value)
   await useGraphql({
     request: buildSavePriceRequest(),
     successHandler: hideAndFetchPrices,
@@ -92,12 +90,12 @@ async function savePrice() {
       }
     },
     failHandler() {
-      message.value?.show('Ошибка при загрузке продукта')
+      message.value?.show('Ошибка при сохранении цены')
     },
   })
 }
 function buildSavePriceRequest() {
-  const {id, shopId, price} = editedPrice.value
+  const {id, shopId, price} = props.editedPrice
   let input, name, responseFields
   if (id) {
     input = {
@@ -131,7 +129,7 @@ function buildSavePriceRequest() {
 }
 function hideAndFetchPrices() {
   hide()
-  props.bus.emit('fetch-prices')
+  emit('price-saved')
 }
 function resetValidation() {
   validation.value = PriceValidation.empty()

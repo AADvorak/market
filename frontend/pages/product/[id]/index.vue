@@ -6,7 +6,10 @@
           <v-card width="100%">
             <v-card-title>{{ product.name || "Новый товар" }} - информация</v-card-title>
             <v-card-text>
-              <product-form :bus="bus"/>
+              <product-form
+                  :product-id="productId"
+                  @product-loaded="productLoaded"
+                  @product-saved="productSaved"/>
             </v-card-text>
           </v-card>
         </v-col>
@@ -15,8 +18,9 @@
             <v-card-title>Цены в магазинах</v-card-title>
             <v-card-text>
               <price-table
+                  ref="priceTable"
                   :product-id="product.id"
-                  :bus="bus"/>
+                  @edit-price="price => editedPrice = price"/>
               <v-btn v-if="user.isAdmin" @click="showShopTable">
                 Добавить
               </v-btn>
@@ -33,34 +37,32 @@
             @selectedRow="addPrice"/>
       </v-row>
     </v-container>
-    <price-editor :product-id="product.id" :bus="bus"/>
+    <price-editor
+        :product-id="productId"
+        :edited-price="editedPrice"
+        @price-saved="() => priceTable?.fetchPrices()"/>
   </div>
 </template>
 
 <script setup lang="ts">
 import {useUser} from "~/stores/user";
-import mitt from "mitt";
-import type {Emitter} from "mitt";
-import {Product, Shop} from "~/data/model";
+import {Price, Product, Shop} from "~/data/model";
+import PriceTable from "~/components/price-table.vue";
 
 const user = useUser()
 
-const bus: Emitter<any> = mitt()
-bus.on('product-loaded', productLoaded)
-bus.on('product-saved', productSaved)
-
 const
+    productId = ref(0),
     product = ref<Product>(Product.empty()),
-    shopTableOpened = ref<boolean>(false)
+    editedPrice = ref(Price.empty()),
+    shopTableOpened = ref<boolean>(false),
+    priceTable = ref<InstanceType<typeof PriceTable> | null>(null)
 
 const
     cols = computed<number>(() => product.value.id ? 6 : 12)
 
 onMounted(() => {
-  const productId: number = parseInt(<string>useRoute().params.id)
-  if (productId) {
-    bus.emit('fetch-product', productId)
-  }
+  productId.value = parseInt(<string>useRoute().params.id)
 })
 function productSaved(value: Product) {
   product.value = value
@@ -71,12 +73,12 @@ function productLoaded(value: Product) {
   product.value = value
 }
 function addPrice(shop: Shop) {
-  bus.emit('edit-price', {
+  editedPrice.value = {
     id: 0,
     shopId: shop.id,
     shopName: shop.name,
     price: 0
-  })
+  }
   hideShopTable()
 }
 function showShopTable() {
