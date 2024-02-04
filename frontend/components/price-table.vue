@@ -16,9 +16,9 @@
       <td>{{ price.shopName }}</td>
       <td>{{ price.price }}</td>
       <td class="text-right" v-if="user.isAdmin">
-        <v-icon @click.stop="askConfirmDeletePrice(price)">
-          {{ mdiDelete }}
-        </v-icon>
+        <v-btn variant="text" @click.stop="askConfirmDeletePrice(price)">
+          <v-icon>{{ mdiDelete }}</v-icon>
+        </v-btn>
       </td>
     </tr>
     </tbody>

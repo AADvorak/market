@@ -40,7 +40,7 @@
     <price-editor
         :product-id="productId"
         :edited-price="editedPrice"
-        @price-saved="() => priceTable?.fetchPrices()"/>
+        @price-saved="fetchPrices"/>
   </div>
 </template>
 
@@ -86,5 +86,8 @@ function showShopTable() {
 }
 function hideShopTable() {
   shopTableOpened.value = false
+}
+function fetchPrices() {
+  priceTable.value?.fetchPrices()
 }
 </script>

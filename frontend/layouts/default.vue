@@ -3,7 +3,7 @@
     <v-app-bar app>
       <v-btn to="/products" nuxt>Товары</v-btn>
       <v-btn to="/shops" nuxt>Магазины</v-btn>
-      <v-switch hide-details v-model="darkMode" label="Темный режим"/>
+      <v-switch v-model="darkMode" hide-details label="Темный режим"/>
       <v-spacer></v-spacer>
       <v-btn> {{ user.description }}</v-btn>
       <v-btn @click="logout">Выход</v-btn>

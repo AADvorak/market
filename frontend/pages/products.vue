@@ -34,9 +34,9 @@
             <td>{{ product.name }}</td>
             <td>{{ product.description }}</td>
             <td class="text-right" v-if="user.isAdmin">
-              <v-icon @click.stop="askConfirmDeleteProduct(product)">
-                {{ mdiDelete }}
-              </v-icon>
+              <v-btn variant="text" @click.stop="askConfirmDeleteProduct(product)">
+                <v-icon>{{ mdiDelete }}</v-icon>
+              </v-btn>
             </td>
           </tr>
           </tbody>

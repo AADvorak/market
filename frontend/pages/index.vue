@@ -6,8 +6,8 @@
       </v-card-title>
       <v-card-text>
         <div>Здравствуйте, {{ user.description }}!</div>
-        <div>Вы залогинились как {{ user.isAdmin ? 'администратор' : 'обычный пользователь' }}.</div>
-        <div>Вам {{ user.isAdmin ? 'доступны просмотр и редактирование' : 'доступен просмотр' }} магазинов, товаров и их цен в магазинах.</div>
+        <div>Вы залогинились как {{ userTypeTxt }}.</div>
+        <div>Вам {{ userAccessTxt }} магазинов, товаров и их цен в магазинах.</div>
       </v-card-text>
     </v-card>
   </div>
@@ -17,4 +17,8 @@
 import {useUser} from "~/stores/user";
 
 const user = useUser()
+
+const
+    userTypeTxt = computed<string>(() => user.isAdmin ? 'администратор' : 'обычный пользователь'),
+    userAccessTxt = computed<string>(() => user.isAdmin ? 'доступны просмотр и редактирование' : 'доступен просмотр')
 </script>
