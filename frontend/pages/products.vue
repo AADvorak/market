@@ -3,49 +3,36 @@
     <v-card width="100%">
       <v-card-title>Товары</v-card-title>
       <v-card-text>
-        <p>
-          <span>Всего: страниц {{ products.pages }}, </span>
-          <span>записей {{ products.elements }}</span>
-        </p>
-        <search-field :init-search-value="filter" @search="setFilter"/>
-        <v-table>
-          <thead>
-          <tr>
-            <th class="text-left">
-              id
-            </th>
-            <th class="text-left">
-              Артикул
-            </th>
-            <th class="text-left">
-              Название
-            </th>
-            <th class="text-left">
-              Описание
-            </th>
-            <th v-if="user.isAdmin" class="text-right"/>
-          </tr>
-          </thead>
-          <tbody>
-          <tr v-for="product in products.data" :key="product.id"
-              style="cursor: pointer" @click="showProduct(product.id)">
-            <td>{{ product.id }}</td>
-            <td>{{ product.vendorCode }}</td>
-            <td>{{ product.name }}</td>
-            <td>{{ product.description }}</td>
-            <td class="text-right" v-if="user.isAdmin">
-              <v-btn variant="text" @click.stop="askConfirmDeleteProduct(product)">
-                <v-icon>{{ mdiDelete }}</v-icon>
-              </v-btn>
-            </td>
-          </tr>
-          </tbody>
-        </v-table>
-        <v-pagination
-            v-model="currentPage"
-            :length="products.pages"
-        ></v-pagination>
-        <v-btn v-if="user.isAdmin" @click="addProduct">Добавить товар</v-btn>
+        <v-data-table-server
+            v-model:items-per-page="itemsPerPage"
+            :headers="headers"
+            :items="products.data"
+            :items-length="products.elements"
+            :search="filter"
+            item-value="name"
+            @update:options="onDataTableOptionsUpdate"
+        >
+          <template v-slot:tfoot>
+            <div class="d-flex">
+              <v-btn v-if="user.isAdmin" @click="addProduct">Добавить товар</v-btn>
+              <v-text-field
+                  :model-value="filter"
+                  class="ml-2"
+                  density="compact"
+                  placeholder="Поиск"
+                  @update:model-value="setFilter"
+                  hide-details/>
+            </div>
+          </template>
+          <template v-slot:item.actions="{ item }">
+            <v-btn variant="text" @click.stop="showProduct(item.id)">
+              <v-icon>{{ user.isAdmin ? mdiPencil : mdiEye }}</v-icon>
+            </v-btn>
+            <v-btn v-if="user.isAdmin" variant="text" @click.stop="askConfirmDeleteProduct(item)">
+              <v-icon>{{ mdiDelete }}</v-icon>
+            </v-btn>
+          </template>
+        </v-data-table-server>
       </v-card-text>
     </v-card>
     <confirm-dialog ref="confirm"/>
@@ -55,7 +42,7 @@
 
 <script setup>
 import {useUser} from "~/stores/user";
-import {mdiDelete} from "@mdi/js";
+import {mdiDelete, mdiPencil, mdiEye} from "@mdi/js";
 import {usePageAndFilter} from "~/composables/page-and-filter";
 import {useGraphql} from "~/composables/graphql";
 import MessageDialog from "~/components/message-dialog.vue";
@@ -77,9 +64,17 @@ const
       data: []
     }),
     message = ref(null),
-    confirm = ref(null)
+    confirm = ref(null),
+    headers = ref([
+      { title: 'id', key: 'id', align: 'start', sortable: false },
+      { title: 'Артикул', key: 'vendorCode', align: 'start', sortable: false },
+      { title: 'Название', key: 'name', align: 'start', sortable: false },
+      { title: 'Описание', key: 'description', align: 'start', sortable: false },
+      { key: 'actions', sortable: false },
+    ]),
+    itemsPerPage = ref(5)
 
-watch([currentPage, filter], () => {
+watch([currentPage, filter, itemsPerPage], () => {
   setUrlParams()
   fetchProducts()
 })
@@ -89,6 +84,11 @@ onMounted(() => {
   setUrlParams()
   fetchProducts()
 })
+
+function onDataTableOptionsUpdate(options) {
+  itemsPerPage.value = options.itemsPerPage
+  currentPage.value = options.page
+}
 
 async function fetchProducts() {
   await useGraphql({
@@ -113,7 +113,7 @@ function buildProductsRequest() {
         type: 'Int!'
       },
       size: {
-        value: 5,
+        value: itemsPerPage.value,
         type: 'Int!'
       }
     },
