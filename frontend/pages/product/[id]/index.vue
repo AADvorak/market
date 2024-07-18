@@ -34,7 +34,7 @@
             :init-current-page="1"
             :exclude-product-id="productId"
             :init-filter="String()"
-            @selectedRow="addPrice"/>
+            @selectedItem="addPrice"/>
       </v-row>
     </v-container>
     <price-editor
