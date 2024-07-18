@@ -10,6 +10,7 @@
             :items-length="products.elements"
             :search="filter"
             item-value="name"
+            items-per-page-text="Размер страницы"
             @update:options="onDataTableOptionsUpdate"
         >
           <template v-slot:tfoot>

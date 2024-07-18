@@ -9,6 +9,7 @@
           :items-length="shops.elements"
           :search="filter"
           item-value="name"
+          items-per-page-text="Размер страницы"
           @click:row="(_, row) => selectItem(row.item)"
           @update:options="onDataTableOptionsUpdate"
       >
